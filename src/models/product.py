@@ -10,10 +10,10 @@ from src.models.types import created_at, updated_at, intpk, is_deleted
 class Product(Base):
     __tablename__ = 'product'
     id: Mapped[intpk]
-    name: Mapped[str] = mapped_column(String(), nullable=False)
-    description: Mapped[str] = mapped_column(String(), nullable=True)
-    price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
-    quantity: Mapped[int] = mapped_column(Integer(), nullable=False)
+    name: Mapped[str] = mapped_column(String())
+    description: Mapped[str | None] = mapped_column(String())
+    price: Mapped[Decimal] = mapped_column(Numeric(10, 2))
+    quantity: Mapped[int] = mapped_column(Integer())
 
     created_at: Mapped[created_at]
     updated_at: Mapped[updated_at]
