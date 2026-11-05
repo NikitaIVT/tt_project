@@ -4,7 +4,7 @@ from sqlalchemy import String, Integer, Numeric, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.models.base import Base
-from src.models.types import created_at, updated_at, intpk
+from src.models.types import created_at, updated_at, intpk, is_deleted
 
 
 class Product(Base):
@@ -17,4 +17,5 @@ class Product(Base):
 
     created_at: Mapped[created_at]
     updated_at: Mapped[updated_at]
+    is_deleted: Mapped[is_deleted]
 

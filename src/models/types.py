@@ -10,3 +10,4 @@ updated_at = Annotated[datetime.datetime, mapped_column(
         server_default=text("TIMEZONE('utc', now())"),
         onupdate=datetime.datetime.now(datetime.timezone.utc)
     )]
+is_deleted = Annotated[bool, mapped_column(server_default=text("false"))]
