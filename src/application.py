@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
-from src.router.healthcheck import router
+from src.routers.healthcheck import router as health_router
 
 
 def get_app() -> FastAPI:
@@ -20,6 +20,6 @@ def get_app() -> FastAPI:
         allow_headers=['*'],
     )
 
-    app.include_router(router)
+    app.include_router(healt_router)
 
     return app
