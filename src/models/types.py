@@ -5,9 +5,18 @@ from sqlalchemy import text
 from sqlalchemy.orm import mapped_column
 
 intpk = Annotated[int, mapped_column(primary_key=True)]
-created_at = Annotated[datetime.datetime, mapped_column(server_default=text("TIMEZONE('utc', now())"))]
-updated_at = Annotated[datetime.datetime, mapped_column(
+created_at = Annotated[
+    datetime.datetime,
+    mapped_column(
+        server_default=text("TIMEZONE('utc', now())")
+    )
+]
+
+updated_at = Annotated[
+    datetime.datetime,
+    mapped_column(
         server_default=text("TIMEZONE('utc', now())"),
-        onupdate=datetime.datetime.now(datetime.timezone.utc)
-    )]
+        onupdate=lambda: datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+    )
+]
 is_deleted = Annotated[bool, mapped_column(server_default=text("false"))]
