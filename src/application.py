@@ -20,6 +20,6 @@ def get_app() -> FastAPI:
         allow_headers=['*'],
     )
 
-    app.include_router(healt_router)
+    app.include_router(health_router)
 
     return app
