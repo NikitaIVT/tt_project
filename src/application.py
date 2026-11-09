@@ -3,6 +3,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
 from src.routers.healthcheck import router as health_router
+from src.routers.products import router as product_router
 
 
 def get_app() -> FastAPI:
@@ -21,5 +22,6 @@ def get_app() -> FastAPI:
     )
 
     app.include_router(health_router)
+    app.include_router(product_router)
 
     return app

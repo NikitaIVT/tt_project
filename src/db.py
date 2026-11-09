@@ -2,12 +2,11 @@ from contextlib import asynccontextmanager
 
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 
-from src.config import Settings
+from src.config import settings
 
-settings = Settings()
 
 engine: AsyncEngine = create_async_engine(
-    str(settings.postgres_url),
+    str(settings.POSTGRES_URL),
     pool_pre_ping=True,
 )
 
