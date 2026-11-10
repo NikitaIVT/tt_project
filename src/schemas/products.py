@@ -1,4 +1,5 @@
 from decimal import Decimal
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
@@ -13,7 +14,7 @@ class ProductCreate(BaseModel):
 
 
 class Product(ProductCreate):
-    id: int
+    id: UUID
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -26,5 +27,5 @@ class ProductPatch(BaseModel):
 
 
 class ProductDelete(BaseModel):
-    id: int
+    id: UUID
     is_deleted: bool = True

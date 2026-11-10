@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from pydantic import BaseModel
 from sqlalchemy import select, insert, update
 
@@ -27,7 +29,7 @@ class BaseRepository:
         res = await self.session.execute(stmt)
         return res.rowcount
 
-    async def set_is_deleted(self, ids: list[int] | int, is_deleted: bool = True):
+    async def set_is_deleted(self, ids: list[UUID] | UUID, is_deleted: bool = True):
         if isinstance(ids, int):
             ids = [ids]
 

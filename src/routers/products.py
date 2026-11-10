@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter
 
 from src.routers.dependencies import DBDep, ProductServiceDep
@@ -23,19 +25,10 @@ async def create_product(
 @router.patch("/{product_id}")
 async def partially_update_product(
     service: ProductServiceDep,
-    product_id: int,
+    product_id: UUID,
     product: ProductPatch,
 ):
     return await service.partially_update_product(product_id, product)
-
-
-@router.put("/{product_id}")
-async def update_product(
-    service: ProductServiceDep,
-    product_id: int,
-    product: ProductCreate,
-):
-    return await service.edit_product(product_id, product)
 
 
 @router.delete("/{product_id}")

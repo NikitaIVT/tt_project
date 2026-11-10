@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from src.schemas.products import ProductCreate, ProductPatch, ProductDelete
 
 
@@ -16,7 +18,7 @@ class ProductService:
 
     async def partially_update_product(
         self,
-        product_id: int,
+        product_id: UUID,
         product: ProductPatch,
     ):
         updated_rows = await self.db.products.update(
@@ -29,7 +31,7 @@ class ProductService:
 
     async def edit_product(
         self,
-        product_id: int,
+        product_id: UUID,
         product: ProductCreate,
     ):
         updated_rows = await self.db.products.update(
@@ -42,7 +44,7 @@ class ProductService:
 
     async def soft_delete_product(
         self,
-        product_id: int,
+        product_id: UUID,
     ):
         deleted_rows = await self.db.products.set_is_deleted(product_id)
         await self.db.commit()
