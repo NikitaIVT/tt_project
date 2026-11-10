@@ -1,7 +1,7 @@
 import datetime
 from typing import Annotated
 
-from sqlalchemy import text
+from sqlalchemy import text, FetchedValue, func
 from sqlalchemy.orm import mapped_column
 
 intpk = Annotated[int, mapped_column(primary_key=True)]
@@ -13,9 +13,8 @@ created_at = Annotated[
 ]
 
 updated_at = Annotated[
-    datetime.datetime,
+    datetime.datetime | None,
     mapped_column(
-        server_default=text("TIMEZONE('utc', now())"),
         onupdate=lambda: datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
     )
 ]
