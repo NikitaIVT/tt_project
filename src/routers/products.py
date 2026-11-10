@@ -2,8 +2,8 @@ from uuid import UUID
 
 from fastapi import APIRouter
 
-from src.routers.dependencies import DBDep, ProductServiceDep
-from src.schemas.products import Product, ProductCreate, ProductPatch
+from src.dependencies.product import ProductServiceDep
+from src.schemas.products import ProductCreate, ProductPatch
 
 router = APIRouter(prefix="/products", tags=["Продукты"])
 
@@ -34,6 +34,6 @@ async def partially_update_product(
 @router.delete("/{product_id}")
 async def soft_delete_product(
     service: ProductServiceDep,
-    product_id: int,
+    product_id: UUID,
 ):
     return await service.soft_delete_product(product_id)
