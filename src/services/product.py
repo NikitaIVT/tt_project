@@ -1,13 +1,16 @@
+from collections.abc import Sequence
 from uuid import UUID
 
+from src.models import Product as ProductModel
 from src.schemas.products import ProductCreate, ProductPatch, ProductDelete
+from src.utils.db_manager import DBManager
 
 
 class ProductService:
-    def __init__(self, db):
+    def __init__(self, db: DBManager):
         self.db = db
 
-    async def get_products(self):
+    async def get_products(self) -> dict[str, str | Sequence[ProductModel]]:
         products = await self.db.products.get_all()
         return {"status": "ok", "data": products}
 
