@@ -1,12 +1,12 @@
 from uuid import UUID
 
 from fastapi import APIRouter
+from starlette import status
 
 from src.dependencies.product import ProductServiceDep
 from src.schemas.products import ProductCreate, ProductPatch
 
 router = APIRouter(prefix="/products", tags=["Продукты"])
-
 
 
 @router.get("")
@@ -19,7 +19,10 @@ async def get_product(product_id: UUID, product_service: ProductServiceDep):
     return await product_service.get_product_by_uuid(product_id)
 
 
-@router.post("")
+@router.post(
+    "",
+    status_code=status.HTTP_201_CREATED
+)
 async def create_product(
     product_service: ProductServiceDep,
     product: ProductCreate,
@@ -28,7 +31,7 @@ async def create_product(
 
 
 @router.patch("/{product_id}")
-async def partially_update_product(
+async def update_product(
     product_service: ProductServiceDep,
     product_id: UUID,
     product: ProductPatch,
