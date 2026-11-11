@@ -1,14 +1,14 @@
 from typing import Annotated
 
 from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.db import SessionFactory
-from src.utils.db_manager import DBManager
+from src.db import get_session
 
 
 async def get_db():
-    async with DBManager(session_factory=SessionFactory) as db:
-        yield db
+    async with get_session() as session:
+        yield session
 
 
-DBDep = Annotated[DBManager, Depends(get_db)]
+DBDep = Annotated[AsyncSession, Depends(get_db)]
