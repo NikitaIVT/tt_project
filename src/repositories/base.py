@@ -1,33 +1,38 @@
 from uuid import UUID
 
-from pydantic import BaseModel
-from sqlalchemy import select, insert, update
+
+from sqlalchemy import select, update, Sequence
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.models import Base
 
 
 class BaseRepository:
     model: None
 
-    def __init__(self, session):
+    def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_all(self):
+    async def get_all(self) -> Sequence[Base]:
         stmt = select(self.model)
         res = await self.session.execute(stmt)
 
         return res.scalars().all()
 
-    async def create(self, data: BaseModel):
-        stmt = insert(self.model).values(**data.model_dump())
-        await self.session.execute(stmt)
-
-    async def update(self, data: BaseModel, exclude_unset: bool = False, **filter_by):
-        stmt = (
-            update(self.model)
-            .filter_by(**filter_by)
-            .values(**data.model_dump(exclude_unset=exclude_unset))
-        )
+    async def get_by_uuid(self, uuid: UUID) -> Base | None:
+        stmt = select(self.model).where(self.model.id == uuid)
         res = await self.session.execute(stmt)
-        return res.rowcount
+
+        return res.scalars().one_or_none()
+
+    async def create(self, data: Base) -> Base:
+        self.session.add(data)
+        await self.session.flush()
+        return data
+
+    async def update(self, data: Base) -> Base:
+        await self.session.flush()
+        return data
 
     async def set_is_deleted(self, ids: list[UUID] | UUID, is_deleted: bool = True):
         if isinstance(ids, int):

@@ -29,3 +29,5 @@ class ProductPatch(BaseModel):
 class ProductDelete(BaseModel):
     id: UUID
     is_deleted: bool = True
+
+    model_config = ConfigDict(from_attributes=True)
