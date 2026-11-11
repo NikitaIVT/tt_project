@@ -1,12 +1,12 @@
 from uuid import UUID
 
-from fastapi import APIRouter
+from cadwyn import VersionedAPIRouter
 from starlette import status
 
 from src.dependencies.product import ProductServiceDep
 from src.schemas.products import ProductCreate, ProductPatch
 
-router = APIRouter(prefix="/products", tags=["Продукты"])
+router = VersionedAPIRouter(prefix="/products", tags=["Продукты"])
 
 
 @router.get("")

@@ -1,8 +1,9 @@
 from typing import Dict
 
-from fastapi import APIRouter
+from cadwyn import VersionedAPIRouter
 
-router = APIRouter()
+
+router = VersionedAPIRouter()
 
 
 @router.get('/healthcheck')
