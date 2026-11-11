@@ -34,15 +34,8 @@ class BaseRepository:
         await self.session.flush()
         return data
 
-    async def set_is_deleted(self, ids: list[UUID] | UUID, is_deleted: bool = True):
-        if isinstance(ids, int):
-            ids = [ids]
-
-        stmt = (
-            update(self.model)
-            .where(self.model.id.in_(ids))
-            .values(is_deleted=is_deleted)
-        )
-        res = await self.session.execute(stmt)
-        return res.rowcount
+    async def delete(self, data: Base) -> Base:
+        data.is_deleted = True
+        await self.session.flush()
+        return data
 

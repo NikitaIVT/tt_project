@@ -41,7 +41,6 @@ class ProductService:
         product_model = await self.products_repository.get_by_uuid(product_id)
         if product_model is None:
             raise ProductNotFoundError(product_id)
-
         update_data = product.model_dump(exclude_unset=True)
 
         for key, value in update_data.items():
@@ -58,7 +57,6 @@ class ProductService:
         if product_model is None:
             raise ProductNotFoundError(product_id)
 
-        product_model.is_deleted = True
-        deleted_product = await self.products_repository.update(product_model)
+        deleted_product = await self.products_repository.delete(product_model)
 
         return ProductDelete.model_validate(deleted_product)
