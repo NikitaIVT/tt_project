@@ -4,6 +4,7 @@ from typing import Any, AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 
 from src.config import settings
+import src.events
 
 
 engine: AsyncEngine = create_async_engine(
@@ -23,7 +24,8 @@ async def get_session() -> AsyncGenerator[AsyncSession | Any, Any]:
     async with SessionFactory() as session:
         try:
             yield session
-            await session.commit()
+            if not session.sync_session.info.get("clean", True):
+                await session.commit()
         except Exception:
             await session.rollback()
             raise
