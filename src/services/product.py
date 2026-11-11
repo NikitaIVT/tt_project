@@ -31,7 +31,7 @@ class ProductService:
         return ProductSchema.model_validate(created_product)
 
 
-    async def partially_update_product(
+    async def update_product(
         self,
         product_id: UUID,
         product: ProductPatch,

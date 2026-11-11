@@ -33,7 +33,7 @@ async def partially_update_product(
     product_id: UUID,
     product: ProductPatch,
 ):
-    return await product_service.partially_update_product(product_id, product)
+    return await product_service.update_product(product_id, product)
 
 
 @router.delete("/{product_id}")
