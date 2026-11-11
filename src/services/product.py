@@ -22,6 +22,8 @@ class ProductService:
 
     async def get_product_by_uuid(self, product_id: UUID) -> ProductSchema:
         product = await self.products_repository.get_by_uuid(product_id)
+        if product is None:
+            raise ProductNotFoundError(product_id)
         return ProductSchema.model_validate(product)
 
     async def create_product(self, product: ProductCreate) -> ProductModel:
