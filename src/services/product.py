@@ -19,6 +19,11 @@ class ProductService:
         products = await self.products_repository.get_all()
         return [ProductSchema.model_validate(product) for product in products]
 
+
+    async def get_product_by_uuid(self, product_id: UUID) -> ProductSchema:
+        product = await self.products_repository.get_by_uuid(product_id)
+        return ProductSchema.model_validate(product)
+
     async def create_product(self, product: ProductCreate) -> ProductModel:
         product_model = ProductModel(**product.model_dump())
         created_product = await self.products_repository.create(product_model)

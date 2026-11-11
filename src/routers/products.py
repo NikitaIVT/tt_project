@@ -14,6 +14,11 @@ async def get_products(product_service: ProductServiceDep):
     return await product_service.get_products()
 
 
+@router.get("/{product_id}")
+async def get_product(product_id: UUID, product_service: ProductServiceDep):
+    return await product_service.get_product_by_uuid(product_id)
+
+
 @router.post("")
 async def create_product(
     product_service: ProductServiceDep,
