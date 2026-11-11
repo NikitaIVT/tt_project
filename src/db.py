@@ -23,9 +23,6 @@ async def get_session() -> AsyncGenerator[AsyncSession | Any, Any]:
     async with SessionFactory() as session:
         try:
             yield session
-            print("new:", session.new)
-            print("dirty:", session.dirty)
-            print("deleted:", session.deleted)
             await session.commit()
         except Exception:
             await session.rollback()
