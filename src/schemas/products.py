@@ -3,14 +3,14 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
-from src.schemas.types import NullableStr, NullableDecimal, NullableInt
+from src.schemas.constraints.product import ProductName, ProductPrice, ProductQuantity, ProductDescription
 
 
 class ProductCreate(BaseModel):
-    name: str
-    description: NullableStr
-    price: Decimal
-    quantity: int
+    name: ProductName
+    description: ProductDescription
+    price: ProductPrice
+    quantity: ProductQuantity
 
 
 class Product(ProductCreate):
@@ -20,10 +20,10 @@ class Product(ProductCreate):
 
 
 class ProductPatch(BaseModel):
-    name: NullableStr
-    description: NullableStr
-    price: NullableDecimal
-    quantity: NullableInt
+    name: ProductName
+    description: ProductDescription
+    price: ProductPrice
+    quantity: ProductQuantity
 
 
 class ProductDelete(BaseModel):
