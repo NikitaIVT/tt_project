@@ -1,13 +1,12 @@
-from contextlib import asynccontextmanager
+from typing import AsyncIterator
 
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 
-from src.config import Settings
+from src.config import settings
 
-settings = Settings()
 
 engine: AsyncEngine = create_async_engine(
-    str(settings.postgres_url),
+    str(settings.POSTGRES_URL),
     pool_pre_ping=True,
 )
 
@@ -18,14 +17,12 @@ SessionFactory = async_sessionmaker(
 )
 
 
-@asynccontextmanager
-async def get_session() -> AsyncSession:
+async def get_read_session() -> AsyncIterator[AsyncSession]:
     async with SessionFactory() as session:
-        try:
+        yield session
+
+
+async def get_session() -> AsyncIterator[AsyncSession]:
+    async with SessionFactory() as session:
+        async with session.begin():
             yield session
-            await session.commit()
-        except Exception:
-            await session.rollback()
-            raise
-        finally:
-            await session.close()
