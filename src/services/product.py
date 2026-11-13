@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from src.exceptions.product import ProductNotFoundError
+from src.exceptions.exceptions import EntityNotFoundError
 
 from src.repositories.mappers.mappers import ProductDataMapper
 from src.repositories.products import ProductsRepository
@@ -23,7 +23,7 @@ class ProductService:
     async def get_product_by_uuid(self, product_id: UUID) -> Product:
         product = await self.products_repository.get_by_id(product_id)
         if product is None:
-            raise ProductNotFoundError(product_id)
+            raise EntityNotFoundError(product_id)
         return ProductDataMapper.map_to_schema(product)
 
     async def create_product(self, product: ProductCreate) -> Product:
@@ -39,7 +39,7 @@ class ProductService:
     ) -> Product:
         product_model = await self.products_repository.get_by_id(product_id)
         if product_model is None:
-            raise ProductNotFoundError(product_id)
+            raise EntityNotFoundError(product_id)
         update_data = product.model_dump(exclude_unset=True)
 
         for key, value in update_data.items():
@@ -54,7 +54,7 @@ class ProductService:
         product_model = await self.products_repository.get_by_id(product_id)
 
         if product_model is None:
-            raise ProductNotFoundError(product_id)
+            raise EntityNotFoundError(product_id)
 
         deleted_product = await self.products_repository.delete(product_model)
 

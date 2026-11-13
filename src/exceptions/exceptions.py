@@ -1,6 +1,6 @@
 from uuid import UUID
 
 
-class ProductNotFoundError(Exception):
+class EntityNotFoundError(Exception):
     def __init__(self, uuid: UUID):
         self.uuid = uuid
