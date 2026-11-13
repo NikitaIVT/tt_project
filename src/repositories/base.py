@@ -1,6 +1,5 @@
 from uuid import UUID
 
-
 from sqlalchemy import select, update, Sequence
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -44,7 +43,7 @@ class BaseRepository:
             .returning(self.model)
         )
         res = await self.session.execute(stmt)
-        return res.scalars().one_or_none()
+        return res.scalar_one_or_none()
 
     async def delete(self, data: Base) -> Base:
         data.is_deleted = True

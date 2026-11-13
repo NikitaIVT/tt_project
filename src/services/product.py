@@ -1,12 +1,13 @@
 from uuid import UUID
 
 from src.exceptions.product import ProductNotFoundError
-from src.models import Product as ProductModel
+
+from src.repositories.mappers.mappers import ProductDataMapper
 from src.repositories.products import ProductsRepository
 from src.schemas.products import (
     ProductCreate,
     ProductPatch,
-    Product as ProductSchema,
+    Product,
     ProductDelete
 )
 
@@ -15,29 +16,27 @@ class ProductService:
     def __init__(self, products_repository: ProductsRepository):
         self.products_repository = products_repository
 
-    async def get_products(self) -> list[ProductSchema]:
+    async def get_products(self) -> list[Product]:
         products = await self.products_repository.get_all()
-        return [ProductSchema.model_validate(product) for product in products]
+        return [ProductDataMapper.map_to_schema(product) for product in products]
 
-
-    async def get_product_by_uuid(self, product_id: UUID) -> ProductSchema:
+    async def get_product_by_uuid(self, product_id: UUID) -> Product:
         product = await self.products_repository.get_by_id(product_id)
         if product is None:
             raise ProductNotFoundError(product_id)
-        return ProductSchema.model_validate(product)
+        return ProductDataMapper.map_to_schema(product)
 
-    async def create_product(self, product: ProductCreate) -> ProductModel:
-        product_model = ProductModel(**product.model_dump())
+    async def create_product(self, product: ProductCreate) -> Product:
+        product_model = ProductDataMapper.map_to_db_model(product)
         created_product = await self.products_repository.create(product_model)
 
-        return ProductSchema.model_validate(created_product)
-
+        return ProductDataMapper.map_to_schema(created_product)
 
     async def update_product(
         self,
         product_id: UUID,
         product: ProductPatch,
-    ) -> ProductSchema:
+    ) -> Product:
         product_model = await self.products_repository.get_by_id(product_id)
         if product_model is None:
             raise ProductNotFoundError(product_id)
@@ -48,7 +47,7 @@ class ProductService:
 
         updated_product = await self.products_repository.update(product_model)
 
-        return ProductSchema.model_validate(updated_product)
+        return ProductDataMapper.map_to_schema(updated_product)
 
 
     async def soft_delete_product(self, product_id: UUID) -> ProductDelete:
@@ -59,4 +58,4 @@ class ProductService:
 
         deleted_product = await self.products_repository.delete(product_model)
 
-        return ProductDelete.model_validate(deleted_product)
+        return ProductDataMapper.map_to_schema(deleted_product, ProductDelete)
