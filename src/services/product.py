@@ -21,7 +21,7 @@ class ProductService:
 
 
     async def get_product_by_uuid(self, product_id: UUID) -> ProductSchema:
-        product = await self.products_repository.get_by_uuid(product_id)
+        product = await self.products_repository.get_by_id(product_id)
         if product is None:
             raise ProductNotFoundError(product_id)
         return ProductSchema.model_validate(product)
@@ -38,7 +38,7 @@ class ProductService:
         product_id: UUID,
         product: ProductPatch,
     ) -> ProductSchema:
-        product_model = await self.products_repository.get_by_uuid(product_id)
+        product_model = await self.products_repository.get_by_id(product_id)
         if product_model is None:
             raise ProductNotFoundError(product_id)
         update_data = product.model_dump(exclude_unset=True)
@@ -52,7 +52,7 @@ class ProductService:
 
 
     async def soft_delete_product(self, product_id: UUID) -> ProductDelete:
-        product_model = await self.products_repository.get_by_uuid(product_id)
+        product_model = await self.products_repository.get_by_id(product_id)
 
         if product_model is None:
             raise ProductNotFoundError(product_id)

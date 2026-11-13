@@ -19,7 +19,7 @@ class BaseRepository:
 
         return res.scalars().all()
 
-    async def get_by_uuid(self, uuid: UUID) -> Base | None:
+    async def get_by_id(self, uuid: UUID) -> Base | None:
         stmt = select(self.model).where(self.model.id == uuid)
         res = await self.session.execute(stmt)
 
