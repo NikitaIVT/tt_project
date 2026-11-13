@@ -20,10 +20,10 @@ class Product(ProductCreate):
 
 
 class ProductPatch(BaseModel):
-    name: ProductName
-    description: ProductDescription
-    price: ProductPrice
-    quantity: ProductQuantity
+    name: ProductName | None = None
+    description: ProductDescription | None = None
+    price: ProductPrice | None = None
+    quantity: ProductQuantity | None = None
 
 
 class ProductDelete(BaseModel):

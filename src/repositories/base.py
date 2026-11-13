@@ -9,6 +9,7 @@ from src.models import Base
 
 class BaseRepository:
     model: None
+    excluded_update_fields = {"id", "created_at", "updated_at", "is_deleted"}
 
     def __init__(self, session: AsyncSession):
         self.session = session
@@ -30,9 +31,20 @@ class BaseRepository:
         await self.session.flush()
         return data
 
-    async def update(self, data: Base) -> Base:
-        await self.session.flush()
-        return data
+    async def update(self, data: Base) -> Base | None:
+        values = {
+            col.key: getattr(data, col.key)
+            for col in self.model.__table__.columns
+            if col.key not in self.excluded_update_fields
+        }
+        stmt = (
+            update(self.model)
+            .where(self.model.id == data.id)
+            .values(values)
+            .returning(self.model)
+        )
+        res = await self.session.execute(stmt)
+        return res.scalars().one_or_none()
 
     async def delete(self, data: Base) -> Base:
         data.is_deleted = True
