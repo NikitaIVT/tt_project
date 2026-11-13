@@ -1,10 +1,8 @@
-from contextlib import asynccontextmanager
-from typing import Any, AsyncGenerator
+from typing import AsyncIterator
 
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 
 from src.config import settings
-import src.events
 
 
 engine: AsyncEngine = create_async_engine(
@@ -19,15 +17,12 @@ SessionFactory = async_sessionmaker(
 )
 
 
-@asynccontextmanager
-async def get_session() -> AsyncGenerator[AsyncSession | Any, Any]:
+async def get_read_session() -> AsyncIterator[AsyncSession]:
     async with SessionFactory() as session:
-        try:
+        yield session
+
+
+async def get_session() -> AsyncIterator[AsyncSession]:
+    async with SessionFactory() as session:
+        async with session.begin():
             yield session
-            if not session.sync_session.info.get("clean", True):
-                await session.commit()
-        except Exception:
-            await session.rollback()
-            raise
-        finally:
-            await session.close()
