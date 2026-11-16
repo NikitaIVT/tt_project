@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from src.exceptions.exceptions import EntityNotFoundError
+from src.exceptions.entity_not_found import EntityNotFoundError
 from src.repositories.mappers.mappers import ProductDataMapper
 from src.repositories.products import ProductsRepository
 from src.schemas.products import (

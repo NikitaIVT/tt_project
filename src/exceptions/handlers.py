@@ -4,7 +4,7 @@ from cadwyn import Cadwyn
 from fastapi import Request
 from fastapi.responses import JSONResponse
 
-from src.exceptions.exceptions import EntityNotFoundError
+from src.exceptions.entity_not_found import EntityNotFoundError
 from src.schemas.responses import ErrorResponse
 
 
