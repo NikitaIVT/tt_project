@@ -1,16 +1,13 @@
-from fastapi import FastAPI
+from cadwyn import Cadwyn
 from starlette.middleware.cors import CORSMiddleware
-from starlette.responses import JSONResponse
 
-from src.router.healthcheck import router
+from src.exceptions.handlers import add_exception_handlers
+from src.routers.routers import add_routers
+from src.versions import versions
 
 
-def get_app() -> FastAPI:
-    app = FastAPI(
-        docs_url='/docs',
-        openapi_url='/openapi.json',
-        default_response_class=JSONResponse,
-    )
+def get_app() -> Cadwyn:
+    app = Cadwyn(versions=versions)
 
     app.add_middleware(
         CORSMiddleware,
@@ -20,6 +17,7 @@ def get_app() -> FastAPI:
         allow_headers=['*'],
     )
 
-    app.include_router(router)
+    add_exception_handlers(app)
+    add_routers(app)
 
     return app

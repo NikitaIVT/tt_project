@@ -1,0 +1,15 @@
+.git
+.cache
+
+**/*.class
+
+*.md
+!README*.md
+README-secret.md
+
+__pycache__/
+*.pyc
+.env
+.vscode/
+node_modules/
+*.log

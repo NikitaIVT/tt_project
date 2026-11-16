@@ -1,23 +1,16 @@
-import sqlalchemy as sa
-from sqlalchemy.orm import DeclarativeMeta, Mapped, declarative_base, mapped_column
-
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column
 from uuid import UUID, uuid4
 
-metadata = sa.MetaData()
+from src.models.base import Base
+from src.models.types import created_at, updated_at, is_deleted
 
 
-class BaseServiceModel:
-    """Базовый класс для таблиц сервиса."""
-
-    @classmethod
-    def on_conflict_constraint(cls) -> tuple | None:
-        return None
-
-
-Base: DeclarativeMeta = declarative_base(metadata=metadata, cls=BaseServiceModel)
-
-
-class UserModel(Base):
+class User(Base):
     __tablename__ = 'users'
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
-    username: Mapped[str] = mapped_column(sa.String())
+    username: Mapped[str] = mapped_column(String())
+
+    created_at: Mapped[created_at]
+    updated_at: Mapped[updated_at]
+    is_deleted: Mapped[is_deleted]
