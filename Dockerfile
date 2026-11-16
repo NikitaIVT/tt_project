@@ -17,6 +17,8 @@ RUN poetry install --only main --no-root \
 
 FROM python:3.12-slim
 
+WORKDIR /app
+
 ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH"
 
@@ -24,4 +26,4 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 COPY . .
 
-CMD alembic upgrade head && python src/main.py
+CMD ["python", "src/main.py"]
