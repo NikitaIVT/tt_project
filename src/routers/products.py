@@ -9,11 +9,6 @@ from src.schemas.products import ProductCreate, ProductPatch
 router = VersionedAPIRouter(prefix="/products", tags=["Продукты"])
 
 
-@router.get("")
-async def get_products(product_service: ProductServiceReadDep):
-    return await product_service.get_products()
-
-
 @router.get("/{product_id}")
 async def get_product(product_id: UUID, product_service: ProductServiceReadDep):
     return await product_service.get_product_by_uuid(product_id)
