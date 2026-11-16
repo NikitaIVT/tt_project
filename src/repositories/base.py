@@ -13,12 +13,6 @@ class BaseRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_all(self) -> Sequence[Base]:
-        stmt = select(self.model)
-        res = await self.session.execute(stmt)
-
-        return res.scalars().all()
-
     async def get_by_id(self, uuid: UUID) -> Base | None:
         stmt = select(self.model).where(self.model.id == uuid)
         res = await self.session.execute(stmt)

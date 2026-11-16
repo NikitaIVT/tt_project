@@ -23,10 +23,6 @@ class ProductService:
             raise EntityNotFoundError(product_id)
         return product
 
-    async def get_products(self) -> list[Product]:
-        products = await self.products_repository.get_all()
-        return self.product_mapper.map_to_schemas(products)
-
     async def get_product_by_id(self, product_id: UUID) -> Product:
         product_model = await self._get_product_or_raise(product_id)
 
