@@ -13,8 +13,9 @@ from src.models import Product as ProductModel
 
 
 class ProductService:
-    def __init__(self, products_repository: ProductsRepository):
+    def __init__(self, products_repository: ProductsRepository, product_mapper: type[ProductDataMapper]):
         self.products_repository = products_repository
+        self.product_mapper = product_mapper
 
     async def _get_product_or_raise(self, product_id: UUID) -> ProductModel:
         product = await self.products_repository.get_by_id(product_id)
@@ -24,18 +25,18 @@ class ProductService:
 
     async def get_products(self) -> list[Product]:
         products = await self.products_repository.get_all()
-        return [ProductDataMapper.map_to_schema(product) for product in products]
+        return self.product_mapper.map_to_schemas(products)
 
     async def get_product_by_uuid(self, product_id: UUID) -> Product:
         product_model = await self._get_product_or_raise(product_id)
 
-        return ProductDataMapper.map_to_schema(product_model)
+        return self.product_mapper.map_to_schema(product_model)
 
     async def create_product(self, product: ProductCreate) -> Product:
-        product_model = ProductDataMapper.map_to_db_model(product)
+        product_model = self.product_mapper.map_to_db_model(product)
         created_product = await self.products_repository.create(product_model)
 
-        return ProductDataMapper.map_to_schema(created_product)
+        return self.product_mapper.map_to_schema(created_product)
 
     async def update_product(
         self,
@@ -44,14 +45,11 @@ class ProductService:
     ) -> Product:
         product_model = await self._get_product_or_raise(product_id)
 
-        update_data = product.model_dump(exclude_unset=True)
-
-        for key, value in update_data.items():
-            setattr(product_model, key, value)
+        self.product_mapper.map_to_existing_model(product, product_model)
 
         updated_product = await self.products_repository.update(product_model)
 
-        return ProductDataMapper.map_to_schema(updated_product)
+        return self.product_mapper.map_to_schema(updated_product)
 
 
     async def soft_delete_product(self, product_id: UUID) -> ProductDelete:
@@ -59,4 +57,4 @@ class ProductService:
 
         deleted_product = await self.products_repository.delete(product_model)
 
-        return ProductDataMapper.map_to_schema(deleted_product, ProductDelete)
+        return self.product_mapper.map_to_schema(deleted_product, ProductDelete)
