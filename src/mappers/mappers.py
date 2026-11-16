@@ -1,4 +1,4 @@
-from src.repositories.mappers.base import DataMapper
+from src.mappers.base import DataMapper
 from src.models import Product as ProductModel
 from src.schemas.products import Product as ProductSchema
 
