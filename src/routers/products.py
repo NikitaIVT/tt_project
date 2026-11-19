@@ -4,6 +4,7 @@ from cadwyn import VersionedAPIRouter
 from starlette import status
 
 from src.dependencies.product import ProductServiceDep, ProductServiceReadDep
+from src.schemas.product_review import ProductReviewCreate
 from src.schemas.products import ProductCreate, ProductPatch
 
 router = VersionedAPIRouter(prefix="/products", tags=["Продукты"])
@@ -11,7 +12,7 @@ router = VersionedAPIRouter(prefix="/products", tags=["Продукты"])
 
 @router.get("/{product_id}")
 async def get_product(product_id: UUID, product_service: ProductServiceReadDep):
-    return await product_service.get_product_by_uuid(product_id)
+    return await product_service.get_product_by_id(product_id)
 
 
 @router.post(
