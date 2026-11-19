@@ -25,7 +25,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('product_id', sa.Uuid(), nullable=False),
     sa.Column('author_name', sa.String(), nullable=False),
-    sa.Column('text', sa.String(), nullable=False),
+    sa.Column('text', sa.String(), nullable=True),
     sa.Column('stars', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text("TIMEZONE('utc', now())"), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
