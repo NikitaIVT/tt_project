@@ -1,7 +1,7 @@
 from uuid import UUID
 
-from sqlalchemy import select, update
-from sqlalchemy.orm import selectinload, with_loader_criteria
+from sqlalchemy import select, update, func
+from sqlalchemy.orm import selectinload, with_loader_criteria, contains_eager, aliased
 
 from src.models import Product as ProductModel, ProductReview as ProductReviewModel
 from src.repositories.base import BaseRepository
@@ -13,6 +13,76 @@ class ProductsRepository(BaseRepository):
 
     excluded_update_fields = {"id", "created_at", "updated_at", "is_deleted", "product_id"}
 
+    async def get_all(
+            self,
+            product_limit: int,
+            product_offset: int,
+            review_limit: int,
+            review_offset: int,
+    ) -> list[ProductModel]:
+        products_cte = (
+            select(self.model)
+            .where(self.model.is_deleted.is_not(True))
+            .order_by(self.model.created_at, self.model.id)
+            .limit(product_limit)
+            .offset(product_offset)
+            .cte("products")
+        )
+
+        products = aliased(self.model, products_cte)
+
+        reviews_cte = (
+            select(
+                self.review_model,
+                func.row_number()
+                .over(
+                    partition_by=self.review_model.product_id,
+                    order_by=(self.review_model.created_at, self.review_model.id),
+                )
+                .label("r_rn"),
+            )
+            .where(
+                self.review_model.product_id.in_(
+                    select(products.id)
+                ),
+                self.review_model.is_deleted.is_not(True),
+            )
+            .cte("reviews")
+        )
+
+        chosen_reviews_cte = (
+            select(reviews_cte)
+            .where(
+                reviews_cte.c.r_rn > review_offset,
+                reviews_cte.c.r_rn <= review_offset + review_limit,
+            )
+            .cte("chosen_reviews")
+        )
+
+        chosen_reviews = aliased(self.review_model, chosen_reviews_cte)
+
+        stmt = (
+            select(products)
+            .outerjoin(
+                chosen_reviews,
+                chosen_reviews.product_id == products.id,
+            )
+            .options(
+                contains_eager(
+                    products.product_reviews,
+                    alias=chosen_reviews,
+                )
+            )
+            .order_by(
+                products.created_at,
+                products.id,
+                chosen_reviews.created_at,
+                chosen_reviews.id,
+            )
+        )
+
+        res = await self.session.execute(stmt)
+        return res.unique().scalars().all()
 
     async def get_by_id(self, uuid: UUID) -> ProductModel | None:
         stmt = (

@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from src.dependencies.pagination_params import ProductPaginationParams, ReviewPaginationParams
 from src.exceptions.entity_not_found import EntityNotFoundError
 from src.mappers.mappers import ProductDataMapper, ProductReviewDataMapper
 from src.repositories.products import ProductsRepository
@@ -29,6 +30,15 @@ class ProductService:
         product_model = await self._get_product_or_raise(product_id)
 
         return self.product_mapper.map_to_schema(product_model)
+
+    async def get_products(self, product_pagination: ProductPaginationParams, review_pagination: ReviewPaginationParams) -> list[Product]:
+        product_models = await self.products_repository.get_all(
+            product_pagination.product_per_page,
+            (product_pagination.product_page - 1) * product_pagination.product_per_page,
+            review_pagination.review_per_page,
+            (review_pagination.review_page - 1) * review_pagination.review_per_page
+        )
+        return self.product_mapper.map_to_schemas(product_models)
 
     async def create_product(self, product: ProductCreate) -> Product:
         product_model = self.product_mapper.map_to_db_model(product)
