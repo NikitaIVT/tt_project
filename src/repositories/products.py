@@ -5,7 +5,6 @@ from sqlalchemy.orm import selectinload, with_loader_criteria
 
 from src.models import Product as ProductModel, ProductReview as ProductReviewModel
 from src.repositories.base import BaseRepository
-from src.schemas.product_review import ProductReviewPatch
 
 
 class ProductsRepository(BaseRepository):
@@ -60,3 +59,10 @@ class ProductsRepository(BaseRepository):
         await self.session.refresh(updated_product, ["product_reviews"])
 
         return updated_product
+
+    async def delete(self, data: ProductModel) -> ProductModel:
+        data.is_deleted = True
+        for review in data.product_reviews:
+            review.is_deleted = True
+        await self.session.flush()
+        return data

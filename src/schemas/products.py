@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from src.schemas.product_review import ProductReview, ProductReviewCreate, ProductReviewPatch
+from src.schemas.product_review import ProductReview, ProductReviewCreate, ProductReviewPatch, ProductReviewDelete
 
 ProductName = Annotated[str, Field(min_length=1, max_length=20)]
 ProductPrice = Annotated[Decimal, Field(gt=0, max_digits=10, decimal_places=2)]
@@ -43,5 +43,6 @@ class ProductPatch(BaseModel):
 class ProductDelete(BaseModel):
     id: UUID
     is_deleted: bool = True
+    product_reviews: list[ProductReviewDelete] = []
 
     model_config = ConfigDict(from_attributes=True)
