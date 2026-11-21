@@ -26,8 +26,6 @@ async def get_products(
         review_pagination: ReviewPaginationDep,
         product_service: ProductServiceReadDep
 ):
-    print(review_pagination.model_dump())
-    print(product_pagination.model_dump())
     return await product_service.get_products(product_pagination, review_pagination)
 
 
