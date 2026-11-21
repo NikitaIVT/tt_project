@@ -77,16 +77,3 @@ class ProductService:
         deleted_product = await self.products_repository.delete(product_model)
 
         return self.product_mapper.map_to_schema(deleted_product, ProductDelete)
-
-    async def create_product_review(self, product_review: ProductReviewCreate, product_id: UUID) -> ProductReview:
-        review_model = self.product_review_mapper.map_to_db_model(product_review)
-        review_model.product_id = product_id
-
-        created_product_review = await self.products_repository.create_review(review_model)
-
-        return self.product_review_mapper.map_to_schema(created_product_review)
-
-    async def get_product_reviews(self, product_id: UUID) -> list[ProductReview]:
-        product_reviews = await self.products_repository.get_all_reviews(product_id)
-
-        return self.product_review_mapper.map_to_schemas(product_reviews)
