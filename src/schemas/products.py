@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 from typing import Annotated
 from uuid import UUID
@@ -46,3 +47,13 @@ class ProductDelete(BaseModel):
     product_reviews: list[ProductReviewDelete] = []
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ProductCursor(BaseModel):
+    created_at: datetime
+    id: UUID
+
+
+class ProductPage(BaseModel):
+    items: list[Product]
+    next_cursor: ProductCursor | None

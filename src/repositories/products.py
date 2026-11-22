@@ -1,6 +1,7 @@
+from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import select, update, func, inspect
+from sqlalchemy import select, update, func, inspect, or_, and_
 from sqlalchemy.orm import selectinload, with_loader_criteria, contains_eager, aliased
 
 from src.models import Product as ProductModel, ProductReview as ProductReviewModel
@@ -11,20 +12,37 @@ class ProductsRepository(BaseRepository):
     model = ProductModel
     review_model = ProductReviewModel
 
-
     async def get_all(
             self,
             product_limit: int,
-            product_offset: int,
+            product_last_seen_created_at: datetime | None,
+            product_last_seen_id: UUID | None,
             review_limit: int,
             review_offset: int,
     ) -> list[ProductModel]:
-        products_cte = (
+        products_stmt = (
             select(self.model)
             .where(self.model.is_deleted.is_not(True))
+        )
+
+        if (
+                product_last_seen_created_at is not None
+                and product_last_seen_id is not None
+        ):
+            products_stmt = products_stmt.where(
+                or_(
+                    self.model.created_at > product_last_seen_created_at,
+                    and_(
+                        self.model.created_at == product_last_seen_created_at,
+                        self.model.id > product_last_seen_id,
+                    ),
+                )
+            )
+
+        products_cte = (
+            products_stmt
             .order_by(self.model.created_at, self.model.id)
             .limit(product_limit)
-            .offset(product_offset)
             .cte("products")
         )
 
@@ -41,9 +59,7 @@ class ProductsRepository(BaseRepository):
                 .label("r_rn"),
             )
             .where(
-                self.review_model.product_id.in_(
-                    select(products.id)
-                ),
+                self.review_model.product_id.in_(select(products.id)),
                 self.review_model.is_deleted.is_not(True),
             )
             .cte("reviews")
@@ -72,6 +88,7 @@ class ProductsRepository(BaseRepository):
                     alias=chosen_reviews,
                 )
             )
+            .execution_options(populate_existing=True)
             .order_by(
                 products.created_at,
                 products.id,
