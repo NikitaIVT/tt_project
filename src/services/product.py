@@ -15,7 +15,7 @@ from src.models import Product as ProductModel
 
 
 class ProductService:
-    def __init__(self, products_repository: ProductsRepository, product_mapper: type[ProductDataMapper], product_review_mapper: type[ProductReviewDataMapper]):
+    def __init__(self, products_repository: ProductsRepository, product_mapper: type[ProductDataMapper]):
         self.products_repository = products_repository
         self.product_mapper = product_mapper
 
