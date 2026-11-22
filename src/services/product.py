@@ -19,10 +19,12 @@ class ProductService:
         self.products_repository = products_repository
         self.product_mapper = product_mapper
 
-    async def _get_product_or_raise(self, product_id: UUID) -> ProductModel:
-        product = await self.products_repository.get_by_id(product_id)
+    async def _get_product_or_raise(self, product_id: UUID, filters: dict | None = None) -> ProductModel:
+        product = await self.products_repository.get_by_id(product_id, filters)
+
         if product is None:
             raise EntityNotFoundError(product_id)
+
         return product
 
     async def get_product_by_id(self, product_id: UUID) -> Product:
@@ -50,7 +52,14 @@ class ProductService:
             product_id: UUID,
             product: ProductPatch,
     ) -> Product:
-        product_model = await self._get_product_or_raise(product_id)
+        review_ids = [review.id for review in product.product_reviews or []]
+
+        filters = {
+            "id": self.products_repository.review_model.id.in_(review_ids),
+            "is_deleted": self.products_repository.review_model.is_deleted.is_not(True),
+        }
+
+        product_model = await self._get_product_or_raise(product_id, filters)
 
         if product.product_reviews:
             existing_review_ids = {
@@ -65,7 +74,7 @@ class ProductService:
 
         updated_product = await self.products_repository.update(
             product_model,
-            product.product_reviews,
+            product_model.product_reviews,
         )
 
         return self.product_mapper.map_to_schema(updated_product)

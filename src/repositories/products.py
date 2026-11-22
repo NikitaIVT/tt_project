@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import select, update, func
+from sqlalchemy import select, update, func, inspect
 from sqlalchemy.orm import selectinload, with_loader_criteria, contains_eager, aliased
 
 from src.models import Product as ProductModel, ProductReview as ProductReviewModel
@@ -11,7 +11,6 @@ class ProductsRepository(BaseRepository):
     model = ProductModel
     review_model = ProductReviewModel
 
-    excluded_update_fields = {"id", "created_at", "updated_at", "is_deleted", "product_id"}
 
     async def get_all(
             self,
@@ -84,17 +83,27 @@ class ProductsRepository(BaseRepository):
         res = await self.session.execute(stmt)
         return res.unique().scalars().all()
 
-    async def get_by_id(self, uuid: UUID) -> ProductModel | None:
-        stmt = (
-            select(self.model)
-            .options(
-                selectinload(self.model.product_reviews),
-                with_loader_criteria(self.review_model, self.review_model.is_deleted.is_not(True)),
-            )
-            .where(self.model.id == uuid)
-        )
-        res = await self.session.execute(stmt)
+    async def get_by_id(self, uuid: UUID, filters: dict | None = None) -> ProductModel | None:
+        stmt = select(self.model).where(self.model.id == uuid)
 
+        if filters is not None:
+            stmt = stmt.options(
+                selectinload(
+                    self.model.product_reviews.and_(
+                        *filters.values()
+                    )
+                )
+            )
+        else:
+            stmt = stmt.options(
+                selectinload(self.model.product_reviews),
+                with_loader_criteria(
+                    self.review_model,
+                    self.review_model.is_deleted.is_not(True),
+                ),
+            )
+
+        res = await self.session.execute(stmt)
         return res.scalar_one_or_none()
 
     async def update(
@@ -106,15 +115,22 @@ class ProductsRepository(BaseRepository):
 
         if updated_product is None or not product_reviews:
             return updated_product
+        updates = []
 
-        updates = [
-            {
-                col.key: getattr(review, col.key)
-                for col in self.review_model.__table__.columns
-                if col.key not in self.excluded_update_fields
-            } | {"id": review.id}
-            for review in product_reviews
-        ]
+        for review in product_reviews:
+            state = inspect(review)
+
+            values = {
+                attr.key: getattr(review, attr.key)
+                for attr in state.mapper.column_attrs
+                if state.attrs[attr.key].history.has_changes()
+            }
+            if values:
+                values["id"] = review.id
+                updates.append(values)
+
+        if not updates:
+            return updated_product
 
         stmt = (
             update(self.review_model)
