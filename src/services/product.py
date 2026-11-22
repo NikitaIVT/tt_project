@@ -1,10 +1,10 @@
 from uuid import UUID
 
-from src.dependencies.pagination_params import ProductPaginationParams, ReviewPaginationParams
 from src.exceptions.entity_not_found import EntityNotFoundError
 from src.mappers.mappers import ProductDataMapper, ProductReviewDataMapper
 from src.repositories.products import ProductsRepository
-from src.schemas.product_review import ProductReviewCreate, ProductReview
+from src.schemas.pagination_params import ProductPaginationParams, ReviewPaginationParams
+
 from src.schemas.products import (
     ProductCreate,
     ProductPatch,
