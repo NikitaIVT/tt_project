@@ -18,7 +18,6 @@ class ProductService:
     def __init__(self, products_repository: ProductsRepository, product_mapper: type[ProductDataMapper], product_review_mapper: type[ProductReviewDataMapper]):
         self.products_repository = products_repository
         self.product_mapper = product_mapper
-        self.product_review_mapper = product_review_mapper
 
     async def _get_product_or_raise(self, product_id: UUID) -> ProductModel:
         product = await self.products_repository.get_by_id(product_id)
