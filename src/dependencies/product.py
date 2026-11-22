@@ -4,7 +4,7 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db import get_read_session, get_session
-from src.mappers.mappers import ProductDataMapper, ProductReviewDataMapper
+from src.mappers.mappers import ProductDataMapper
 from src.repositories.products import ProductsRepository
 from src.services.product import ProductService
 
