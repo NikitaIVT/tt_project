@@ -11,7 +11,6 @@ from src.models.timestamp_soft_delete_mixin import TimestampSoftDeleteMixin
 class ProductReview(Base, TimestampSoftDeleteMixin):
     __tablename__ = "product_review"
 
-    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     product_id: Mapped[UUID] = mapped_column(ForeignKey("product.id", ondelete="CASCADE"))
     author_name: Mapped[str] = mapped_column(String)
     text: Mapped[str] = mapped_column(String, nullable=True)
