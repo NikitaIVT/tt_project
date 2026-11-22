@@ -17,7 +17,7 @@ class ProductCreate(BaseModel):
     description: ProductDescription
     price: ProductPrice
     quantity: ProductQuantity
-    product_reviews: list[ProductReviewCreate] = []
+    product_reviews: list[ProductReviewCreate] = Field(min_length=1)
 
 
 class Product(BaseModel):
