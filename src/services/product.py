@@ -2,8 +2,9 @@ from uuid import UUID
 
 from src.exceptions.entity_not_found import EntityNotFoundError
 from src.mappers.mappers import ProductDataMapper
+from src.repositories.pagination import ProductPagination
 from src.repositories.products import ProductsRepository
-from src.schemas.pagination_params import ProductPaginationParams, ReviewPaginationParams
+from src.schemas.pagination_params import ProductPaginationParams
 
 from src.schemas.products import (
     ProductCreate,
@@ -35,17 +36,15 @@ class ProductService:
     async def get_products(
             self,
             product_pagination: ProductPaginationParams,
-            review_pagination: ReviewPaginationParams,
     ) -> ProductPage:
         product_limit = product_pagination.product_per_page
-
-        product_models = await self.products_repository.get_all(
-            product_limit=product_limit + 1,
-            product_last_seen_created_at=product_pagination.product_last_seen_created_at,
-            product_last_seen_id=product_pagination.product_last_seen_id,
-            review_limit=review_pagination.review_per_page,
-            review_offset=(review_pagination.review_page - 1) * review_pagination.review_per_page
+        pagination = ProductPagination(
+            limit=product_limit + 1,
+            last_seen_created_at=product_pagination.product_last_seen_created_at,
+            last_seen_id=product_pagination.product_last_seen_id,
         )
+
+        product_models = await self.products_repository.get_all(pagination)
 
         has_next = len(product_models) > product_limit
         product_models = product_models[:product_limit]
