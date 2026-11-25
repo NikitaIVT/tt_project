@@ -3,7 +3,7 @@ from uuid import UUID
 from cadwyn import VersionedAPIRouter
 from starlette import status
 
-from src.dependencies.pagination_params import ProductPaginationDep, ReviewPaginationDep
+from src.dependencies.pagination_params import ProductPaginationDep
 from src.dependencies.product import ProductServiceDep, ProductServiceReadDep
 from src.schemas.products import ProductCreate, ProductPatch, Product
 
@@ -23,10 +23,9 @@ async def get_product(product_id: UUID, product_service: ProductServiceReadDep):
 )
 async def get_products(
         product_pagination: ProductPaginationDep,
-        review_pagination: ReviewPaginationDep,
         product_service: ProductServiceReadDep
 ):
-    return await product_service.get_products(product_pagination, review_pagination)
+    return await product_service.get_products(product_pagination)
 
 
 @router.post(
