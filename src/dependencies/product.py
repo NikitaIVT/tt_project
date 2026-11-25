@@ -20,7 +20,6 @@ def product_service_dependency(session_dependency):
     ) -> ProductService:
         repository = ProductsRepository(session)
         return ProductService(repository, data_mapper)
-
     return dependency
 
 get_read_product_service = product_service_dependency(get_read_session)
